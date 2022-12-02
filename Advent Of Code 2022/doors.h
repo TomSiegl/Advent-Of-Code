@@ -5,5 +5,10 @@ namespace door {
 		void first();
 		void second();
 	}
+
+	namespace two {
+		void first();
+		void second();
+	}
 }
 
