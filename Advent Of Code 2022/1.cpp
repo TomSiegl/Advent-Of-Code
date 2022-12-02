@@ -7,7 +7,7 @@
 namespace door {
 	namespace one {
 		void first() {
-			std::string filename{ "input1.txt" };
+			std::string filename{ "inputs/1.txt" };
 			std::ifstream inf{ filename };
 
 			if (!inf) {
@@ -35,7 +35,7 @@ namespace door {
 		}
 		
 		void second() {
-			std::string filename{ "input1.txt" };
+			std::string filename{ "inputs/1.txt" };
 			std::ifstream inf{ filename };
 
 			if (!inf) {
