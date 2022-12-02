@@ -23,7 +23,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="1.h">
+    <ClInclude Include="doors.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
   </ItemGroup>
