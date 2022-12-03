@@ -33,7 +33,7 @@ namespace door {
 			return (opponent + 1) % 3;
 		}
 
-		void solve_puzzle(std::function<int(std::string)> score_update) {
+		void solve_puzzle(std::function<void(std::string, int&)> score_update) {
 			std::string filename{ "inputs/2.txt" };
 			std::ifstream input_file{ filename };
 
@@ -45,40 +45,30 @@ namespace door {
 			int score = 0;
 
 			std::string curr_line{};
-			int first_input{};
-			int second_input{};
 			while (input_file) {
 				std::getline(input_file, curr_line);
 				if (curr_line.length() == 0) { break; }
 
-				score += score_update(curr_line);
+				score_update(curr_line, score);
 			}
 
 			std::cout << score << '\n';
 		}
 
-		int score_update_first(std::string line) {
-			int update = 0;
-
+		void score_update_first(std::string line, int& score) {
 			int opponent{ opponent_to_int(line[0]) };
 			int own{ own_to_int(line[2]) };
 
-			update += own + 1; // score for shape
-			update += rps_outcome_score(opponent, own); // score for outcome
-
-			return update;
+			score += own + 1; // score for shape
+			score += rps_outcome_score(opponent, own); // score for outcome
 		}
 
-		int score_update_second(std::string line) {
-			int update = 0;
-
+		void score_update_second(std::string line, int& score) {
 			int opponent{ opponent_to_int(line[0]) };
 			int outcome{ outcome_to_int(line[2]) };
 
-			update += get_own(opponent, outcome) + 1;
-			update += outcome * 3;
-
-			return update;
+			score += get_own(opponent, outcome) + 1;
+			score += outcome * 3;
 		}
 
 		void first() {
