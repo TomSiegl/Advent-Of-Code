@@ -15,5 +15,10 @@ namespace door {
 		void first();
 		void second();
 	}
+
+	namespace four {
+		void first();
+		void second();
+	}
 }
 
