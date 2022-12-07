@@ -1,6 +1,6 @@
 #include "doors.h"
 
-using namespace door::six;
+using namespace door::seven;
 
 int main() {
 	first();

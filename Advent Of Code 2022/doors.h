@@ -30,5 +30,10 @@ namespace door {
 		void first();
 		void second();
 	}
+
+	namespace seven {
+		void first();
+		void second();
+	}
 }
 
