@@ -74,18 +74,18 @@ namespace calendar {
 		return get_min_size_above(root, missing_storage);
 	}
 
-	dir read_filesystem() {
+	dir* read_filesystem() {
 		std::string filename{ "inputs/7.txt" };
 		std::ifstream inf{ filename };
 
 		if (!inf) {
 			std::cerr << "Coudln't open " << filename << '\n';
-			exit(1);
+			return nullptr;
 		}
 
 		std::string root_name{ "/" };
-		dir root{&root_name, nullptr};
-		dir* curr_dir{ &root };
+		dir* root{ new dir{&root_name, nullptr} };
+		dir* curr_dir{ root };
 
 		while (inf) {
 			std::string curr_line{};
@@ -108,7 +108,7 @@ namespace calendar {
 						curr_dir = (*curr_dir).superdir;
 					}
 					else if (target_dir_name == "/") {
-						curr_dir = &root;
+						curr_dir = root;
 					}
 					else {
 						curr_dir = *std::find_if(
@@ -147,20 +147,22 @@ namespace calendar {
 			}
 		}
 
-		root.calc_size();
+		(*root).calc_size();
 		return root;
 	}
 
 	template<>
 	void first<7>() {
-		dir root = read_filesystem();
-		std::cout << sum_small_dirs(&root) << '\n';
+		dir* root = read_filesystem();
+		if (root == nullptr) return;
+		std::cout << sum_small_dirs(root) << '\n';
 	}
 
 	template<>
 	void second<7>() {
-		dir root = read_filesystem();
-		std::cout << get_min_deletable_size(&root) << '\n';
+		dir* root = read_filesystem();
+		if (root == nullptr) return;
+		std::cout << get_min_deletable_size(root) << '\n';
 	}
 }
 
