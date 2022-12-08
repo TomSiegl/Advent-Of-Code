@@ -6,18 +6,108 @@
 #include <vector>
 #include <algorithm>
 #include <cassert>
+#include <filesystem>
+#include <set>
 
 namespace calendar {
 	using int_2d_vec = std::vector<std::vector<int>>;
 	using bool_2d_vec = std::vector<std::vector<bool>>;
+	using Direction = std::pair<int, int>;
+
+	struct Directions {
+		static constexpr Direction x_pos{ 1, 0 };
+		static constexpr Direction x_neg{ -1, 0 };
+		static constexpr Direction y_pos{ 0, -1 };
+		static constexpr Direction y_neg{ 0, 1 };
+	};
+
+	struct ViewDistances {
+		int top{};
+		int bottom{};
+		int left{};
+		int right{};
+	};
+
+	using dist_2d_vec = std::vector<std::vector<ViewDistances>>;
+
+	class Front {
+	public:
+		virtual void step(int x, int y) = 0;
+	};
+
+	class VisibilityFront {
+	private:
+		std::vector<int> highest_seen_trees;
+		bool_2d_vec& visibility_map;
+		int_2d_vec& forest;
+		bool front_move_direction_x;
+
+	public:
+		VisibilityFront(int front_size, bool_2d_vec& visibility_map, int_2d_vec& forest, Direction direction) :
+			highest_seen_trees(front_size, -1),
+			visibility_map{ visibility_map },
+			forest{ forest },
+			front_move_direction_x{ direction.first != 0 } {}
+
+		void step(int x, int y) {
+			int front_index{ front_move_direction_x ? y : x };
+			visibility_map[y][x] = visibility_map[y][x] || (highest_seen_trees[front_index] < forest[y][x]);
+			highest_seen_trees[front_index] = std::max(highest_seen_trees[front_index], forest[y][x]);
+		}
+	};
+
+	class ScenicScoreFront {
+	private:
+		int_2d_vec seen_trees;
+		dist_2d_vec& view_distance_map;
+		int_2d_vec& forest;
+		Direction direction;
+		bool front_move_direction_x;
+
+	public:
+		ScenicScoreFront(int front_size, dist_2d_vec& view_distance_map, int_2d_vec& forest, Direction direction) :
+			seen_trees(front_size, std::vector<int>{}),
+			view_distance_map{ view_distance_map },
+			forest{ forest },
+			direction{ direction },
+			front_move_direction_x{ direction.first != 0 } {}
+
+		void step(int x, int y) {
+			int front_index{ front_move_direction_x ? y : x };
+			int curr_tree_height{ forest[y][x] };
+
+			if (seen_trees[front_index].size() == 0) {
+				seen_trees[front_index].push_back(forest[y][x]);
+				return;
+			}
+
+			auto blocking_tree_it = std::find_if(seen_trees[front_index].rbegin(), seen_trees[front_index].rend(), [&](int e) { return e >= curr_tree_height; });
+			int dist = static_cast<int>(std::distance(seen_trees[front_index].rbegin(), blocking_tree_it)) + 1;
+			dist = std::min(dist, static_cast<int>(seen_trees[front_index].size()));
+			if (direction == Directions::x_pos) { view_distance_map[y][x].left = dist; }
+			else if (direction == Directions::x_neg) { view_distance_map[y][x].right = dist; }
+			else if (direction == Directions::y_pos) { view_distance_map[y][x].bottom = dist; }
+			else if (direction == Directions::y_neg) { view_distance_map[y][x].top = dist; }
+			seen_trees[front_index].push_back(forest[y][x]);
+		}
+	};
+
+	template<typename Front_T>
+	class MapTypeSelector;
+
+	template <> class MapTypeSelector<VisibilityFront> { public: using MapType = int_2d_vec; };
+	template <> class MapTypeSelector<ScenicScoreFront> { public: using MapType = dist_2d_vec; };
 
 	int_2d_vec get_forest() {
-		const std::string filename{ "inputs/8.txt" };
-		std::ifstream inf{ filename };
+		// TODO: move to own file
+		const std::string inputs_dir{ "inputs" };
+		const std::string filename{ "8.txt" };
+		std::filesystem::path input_path{ std::filesystem::current_path() / inputs_dir / filename };
+		std::ifstream inf{ input_path.string() };
 
 		int_2d_vec forest{};
 		if (!inf) {
-			std::cerr << "Couldn't read " << filename << '\n';
+			std::cerr << "Couldn't read " << input_path.string() << '\n';
 			return forest;
 		}
 
@@ -37,45 +127,49 @@ namespace calendar {
 		return forest;
 	}
 
-	void write_directional_forest_visibilities(bool_2d_vec& visibility_map, int_2d_vec forest, int x_step, int y_step) {
-		bool front_move_direction_x{ x_step != 0 };
+	template<typename Front_T, typename Map_T = typename MapTypeSelector<Front_T>::MapType>
+	void apply_front_directional(Map_T& tree_value_map, int_2d_vec& forest, Direction direction) {
+		int x_size = static_cast<int>(tree_value_map[0].size());
+		int y_size = static_cast<int>(tree_value_map.size());
 
-		int x_size = static_cast<int>(visibility_map[0].size());
-		int y_size = static_cast<int>(visibility_map.size());
+		int x_start{ direction.first == -1 ? x_size - 1 : 0 };
+		int x_end{ direction.first == -1 ? -1 : x_size };
+		int y_start{ direction.second == -1 ? y_size - 1 : 0 };
+		int y_end{ direction.second == -1 ? -1 : y_size };
 
-		int x_start{ x_step == -1 ? x_size - 1 : 0 };
-		int x_end{ x_step == -1 ? -1 : x_size };
-		int y_start{ y_step == -1 ? y_size - 1 : 0 };
-		int y_end{ y_step == -1 ? -1 : y_size };
+		int x_step = direction.first == 0 ? 1 : direction.first;
+		int y_step = direction.second == 0 ? 1 : direction.second;
 
-		x_step = x_step == 0 ? 1 : x_step;
-		y_step = y_step == 0 ? 1 : y_step;
-
+		bool front_move_direction_x{ direction.first != 0 };
 		int front_size{ front_move_direction_x ? y_size : x_size };
-		std::vector<int> highest_seen_trees(front_size, -1);
+		Front_T front{ front_size, tree_value_map, forest, direction };
 		for (int y{ y_start }; y != y_end; y += y_step) {
 			for (int x{ x_start }; x != x_end; x += x_step) {
-				int front_index{ front_move_direction_x ? y : x };
-				visibility_map[y][x] = visibility_map[y][x] || (highest_seen_trees[front_index] < forest[y][x]);
-				highest_seen_trees[front_index] = std::max(highest_seen_trees[front_index], forest[y][x]);
-				assert(!(((front_move_direction_x && (x == x_start || x == x_end)) || (!front_move_direction_x && (y == y_start || y == y_end))) && !visibility_map[y][x]));
+				front.step(x, y);
 			}
 		}
 	}
 
-	void write_forest_visibilities(bool_2d_vec& visibility_map, int_2d_vec& forest) {
-		const std::vector<std::pair<int, int>> directions{ {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
+	template<typename Front_T, typename Map_T = typename MapTypeSelector<Front_T>::MapType>
+	void apply_front_all_directions(Map_T& tree_value_map, int_2d_vec& forest) {
+		const std::vector<Direction> directions{ Directions::x_pos, Directions::x_neg, Directions::y_pos, Directions:: y_neg };
 
-		for (std::pair<int, int> direction : directions) {
-			write_directional_forest_visibilities(visibility_map, forest, direction.first, direction.second);
+		for (Direction direction : directions) {
+			apply_front_directional<Front_T>(tree_value_map, forest, direction);
 		}
+	}
+
+	int get_scenic_score(ViewDistances distances) {
+		return distances.top * distances.bottom * distances.left * distances.right;
 	}
 
 	template<>
 	void first<8>() {
 		int_2d_vec forest{ get_forest() };
+		if (forest.size() == 0) { return; }
+
 		bool_2d_vec visibility_map{ forest.size(), std::vector<bool>( forest[0].size(), false )};
-		write_forest_visibilities(visibility_map, forest);
+		apply_front_all_directions<VisibilityFront>(visibility_map, forest);
 		
 		int visible_count{ 0 };
 		std::for_each(visibility_map.begin(), visibility_map.end(),
@@ -92,7 +186,20 @@ namespace calendar {
 
 	template<>
 	void second<8>() {
-		std::cout << "Not yet implemented.\n";
+		int_2d_vec forest{ get_forest() };
+		if (forest.size() == 0) { return; }
+
+		dist_2d_vec view_distance_map(forest.size(), std::vector<ViewDistances>(forest[0].size(), ViewDistances{}));
+		apply_front_all_directions<ScenicScoreFront>(view_distance_map, forest);
+
+		int highest_scenic_score{};
+		for (std::vector<ViewDistances> view_distance_row : view_distance_map) {
+			for (ViewDistances view_distances : view_distance_row) {
+				highest_scenic_score = std::max(highest_scenic_score, get_scenic_score(view_distances));
+			}
+		}
+
+		std::cout << highest_scenic_score << '\n';
 	}
 }
 
