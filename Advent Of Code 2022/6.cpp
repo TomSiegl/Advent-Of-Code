@@ -1,9 +1,9 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <deque>
 #include <algorithm>
-#include "doors.h"
 
 namespace calendar {
 	void solve_puzzle(int num_different_chars) {

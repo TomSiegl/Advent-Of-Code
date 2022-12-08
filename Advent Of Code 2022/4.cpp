@@ -1,9 +1,9 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <functional>
-#include "doors.h"
 
 namespace calendar {
 	void solve_puzzle(std::function<bool(std::pair<int, int>&, std::pair<int, int>&)> is_overlap) {

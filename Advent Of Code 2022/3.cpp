@@ -1,3 +1,4 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -5,7 +6,6 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
-#include "doors.h"
 
 namespace calendar {
 	int get_prio(char c) {

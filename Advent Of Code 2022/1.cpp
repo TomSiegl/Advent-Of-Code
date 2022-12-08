@@ -1,9 +1,9 @@
+#include "doors.h"
 #include <fstream>
 #include <iostream>
 #include <string>
 #include <vector>
 #include <algorithm>
-#include "doors.h"
 
 namespace calendar {
 	template<>

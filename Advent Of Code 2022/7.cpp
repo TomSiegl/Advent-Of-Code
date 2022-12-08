@@ -1,3 +1,4 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -5,7 +6,6 @@
 #include <sstream>
 #include <algorithm>
 #include <variant>
-#include "doors.h"
 
 namespace calendar {
 	// This has to be possible with less pointers...

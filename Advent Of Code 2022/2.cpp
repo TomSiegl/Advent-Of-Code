@@ -1,8 +1,8 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <functional>
-#include "doors.h"
 
 namespace calendar {
 	int opponent_to_int(char opponent) {

@@ -1,10 +1,10 @@
+#include "doors.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <vector>
 #include <sstream>
 #include <functional>
-#include "doors.h"
 
 namespace calendar {
 	std::vector<std::vector<char>> read_stacks(std::ifstream& inf) {

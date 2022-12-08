@@ -1,5 +1,5 @@
-#include <iostream>
 #include "doors.h"
+#include <iostream>
 
 namespace calendar {
 	template<>
