@@ -39,6 +39,9 @@
     <ClCompile Include="7.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="8.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doors.h">

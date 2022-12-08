@@ -24,7 +24,7 @@ namespace door {
 						exit(1);
 					}
 
-					num_stacks = (curr_line.length() + 1) / 4;
+					num_stacks = (static_cast<int>(curr_line.length()) + 1) / 4;
 					for (int i{ 0 }; i < num_stacks; i++) {
 						stacks.push_back({});
 					}
@@ -53,6 +53,7 @@ namespace door {
 
 			if (!inf) {
 				std::cerr << "Couldn't read " << filename << '\n';
+				return;
 			}
 			
 			std::vector<std::vector<char>> stacks{ read_stacks(inf) };

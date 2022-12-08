@@ -30,6 +30,7 @@ namespace door {
 
 			if (!inf) {
 				std::cout << "Couldn't open " << filename << '\n';
+				return;
 			}
 
 			std::cout << get_prio(inf) << '\n';

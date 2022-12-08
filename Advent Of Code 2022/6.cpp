@@ -12,6 +12,7 @@ namespace door {
 
 			if (!inf) {
 				std::cerr << "Couldn't open " << filename << "\n";
+				return;
 			}
 
 			int result{ 0 };

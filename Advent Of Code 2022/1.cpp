@@ -57,7 +57,7 @@ namespace door {
 			}
 
 			std::sort(calories_sums.begin(), calories_sums.end());
-			int len = calories_sums.size();
+			int len{ static_cast<int>(calories_sums.size()) };
 			int top_three_sum = 0;
 			for (int i{ len-1 }; i >= len-3; --i) {
 				top_three_sum += calories_sums[i];
