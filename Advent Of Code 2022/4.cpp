@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,13 +8,8 @@
 
 namespace calendar {
 	void solve_puzzle(std::function<bool(std::pair<int, int>&, std::pair<int, int>&)> is_overlap) {
-		std::string filename{ "inputs/4.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cerr << "Couldn't open " << filename << '\n';
-			return;
-		}
+		std::ifstream inf{ get_input_stream(4) };
+		if (!inf) { return; }
 
 		int fully_contained_count{ 0 };
 		while (inf) {

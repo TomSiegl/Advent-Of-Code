@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -34,19 +35,14 @@ namespace calendar {
 	}
 
 	void solve_puzzle(std::function<void(std::string, int&)> score_update) {
-		std::string filename{ "inputs/2.txt" };
-		std::ifstream input_file{ filename };
-
-		if (!input_file) {
-			std::cerr << "Couldn't open " << filename << '\n';
-			return;
-		}
+		std::ifstream inf{ get_input_stream(2) };
+		if (!inf) { return; }
 
 		int score = 0;
 
 		std::string curr_line{};
-		while (input_file) {
-			std::getline(input_file, curr_line);
+		while (inf) {
+			std::getline(inf, curr_line);
 			if (curr_line.length() == 0) { break; }
 
 			score_update(curr_line, score);

@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -98,18 +99,9 @@ namespace calendar {
 	template <> class MapTypeSelector<VisibilityFront> { public: using MapType = int_2d_vec; };
 	template <> class MapTypeSelector<ScenicScoreFront> { public: using MapType = dist_2d_vec; };
 
-	int_2d_vec get_forest() {
-		// TODO: move to own file
-		const std::string inputs_dir{ "inputs" };
-		const std::string filename{ "8.txt" };
-		std::filesystem::path input_path{ std::filesystem::current_path() / inputs_dir / filename };
-		std::ifstream inf{ input_path.string() };
-
-		int_2d_vec forest{};
-		if (!inf) {
-			std::cerr << "Couldn't read " << input_path.string() << '\n';
-			return forest;
-		}
+	void get_forest(int_2d_vec* forest) {
+		std::ifstream inf{ get_input_stream(8) };
+		if (!inf) { return; }
 
 		while (inf) {
 			std::string curr_line{};
@@ -121,10 +113,8 @@ namespace calendar {
 			for (auto curr_char_it{ curr_line.begin() }; curr_char_it != curr_line.end(); ++curr_char_it) {
 				forest_row.push_back((*curr_char_it) - '0');
 			}
-			forest.push_back(forest_row);
+			(*forest).push_back(forest_row);
 		}
-
-		return forest;
 	}
 
 	template<typename Front_T, typename Map_T = typename MapTypeSelector<Front_T>::MapType>
@@ -165,7 +155,11 @@ namespace calendar {
 
 	template<>
 	void first<8>() {
-		int_2d_vec forest{ get_forest() };
+		int_2d_vec* forest_ptr{};
+		get_forest(forest_ptr);
+		if (forest_ptr == nullptr) { return; }
+
+		int_2d_vec forest{ *forest_ptr };
 		if (forest.size() == 0) { return; }
 
 		bool_2d_vec visibility_map{ forest.size(), std::vector<bool>( forest[0].size(), false )};
@@ -186,7 +180,11 @@ namespace calendar {
 
 	template<>
 	void second<8>() {
-		int_2d_vec forest{ get_forest() };
+		int_2d_vec* forest_ptr{};
+		get_forest(forest_ptr);
+		if (forest_ptr == nullptr) { return; }
+
+		int_2d_vec forest{ *forest_ptr };
 		if (forest.size() == 0) { return; }
 
 		dist_2d_vec view_distance_map(forest.size(), std::vector<ViewDistances>(forest[0].size(), ViewDistances{}));

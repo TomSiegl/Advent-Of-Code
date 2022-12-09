@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -25,13 +26,8 @@ namespace calendar {
 	}
 
 	void solve_puzzle(std::function<int(std::ifstream&)> get_prio) {
-		std::string filename{ "inputs/3.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cout << "Couldn't open " << filename << '\n';
-			return;
-		}
+		std::ifstream inf{ get_input_stream(3) };
+		if (!inf) { return; }
 
 		std::cout << get_prio(inf) << '\n';
 	}

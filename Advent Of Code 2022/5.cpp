@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -48,13 +49,8 @@ namespace calendar {
 	}
 
 	void solve_puzzle(std::function<void(std::vector<std::vector<char>>&, int, int, int)> rearrange) {
-		std::string filename{ "inputs/5.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cerr << "Couldn't read " << filename << '\n';
-			return;
-		}
+		std::ifstream inf{ get_input_stream(5) };
+		if (!inf) { return; }
 		
 		std::vector<std::vector<char>> stacks{ read_stacks(inf) };
 

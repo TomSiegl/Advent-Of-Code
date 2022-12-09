@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -75,13 +76,8 @@ namespace calendar {
 	}
 
 	dir* read_filesystem() {
-		std::string filename{ "inputs/7.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cerr << "Coudln't open " << filename << '\n';
-			return nullptr;
-		}
+		std::ifstream inf{ get_input_stream(7) };
+		if (!inf) { return nullptr; }
 
 		std::string root_name{ "/" };
 		dir* root{ new dir{&root_name, nullptr} };

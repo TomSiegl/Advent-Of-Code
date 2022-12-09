@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -8,13 +9,8 @@
 namespace calendar {
 	template<>
 	void first<1>() {
-		std::string filename{ "inputs/1.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cerr << "Couldn't open " << filename << std::endl;
-			return;
-		}
+		std::ifstream inf{ get_input_stream(1) };
+		if (!inf) { return; }
 
 		std::string input{};
 		int curr_calories = 0;

@@ -1,4 +1,5 @@
 #include "doors.h"
+#include "input.h"
 #include <iostream>
 #include <fstream>
 #include <string>
@@ -7,13 +8,8 @@
 
 namespace calendar {
 	void solve_puzzle(int num_different_chars) {
-		std::string filename{ "inputs/6.txt" };
-		std::ifstream inf{ filename };
-
-		if (!inf) {
-			std::cerr << "Couldn't open " << filename << "\n";
-			return;
-		}
+		std::ifstream inf{ get_input_stream(6) };
+		if (!inf) { return; }
 
 		int result{ 0 };
 		char current_char{};
