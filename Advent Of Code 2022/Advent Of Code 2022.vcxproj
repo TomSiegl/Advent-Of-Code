@@ -32,6 +32,7 @@
     <ClCompile Include="input.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="abort_reason.h" />
     <ClInclude Include="doors.h" />
     <ClInclude Include="input.h" />
   </ItemGroup>

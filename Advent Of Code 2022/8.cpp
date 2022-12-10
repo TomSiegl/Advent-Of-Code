@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <filesystem>
 #include <set>
+#include <cassert>
 
 namespace calendar {
 	using int_2d_vec = std::vector<std::vector<int>>;
@@ -154,11 +155,11 @@ namespace calendar {
 
 	template<>
 	void first<8>() {
-		int_2d_vec* forest_ptr{};
+		int_2d_vec forest{};
+		int_2d_vec* forest_ptr{ &forest };
 		get_forest(forest_ptr);
 		if (forest_ptr == nullptr) { return; }
 
-		int_2d_vec forest{ *forest_ptr };
 		if (forest.size() == 0) { return; }
 
 		bool_2d_vec visibility_map{ forest.size(), std::vector<bool>( forest[0].size(), false )};
@@ -174,16 +175,18 @@ namespace calendar {
 				);
 			}
 		);
+
+		assert(visible_count == 1776);
 		std::cout << visible_count << '\n';
 	}
 
 	template<>
 	void second<8>() {
-		int_2d_vec* forest_ptr{};
+		int_2d_vec forest{};
+		int_2d_vec* forest_ptr{ &forest };
 		get_forest(forest_ptr);
 		if (forest_ptr == nullptr) { return; }
 
-		int_2d_vec forest{ *forest_ptr };
 		if (forest.size() == 0) { return; }
 
 		dist_2d_vec view_distance_map(forest.size(), std::vector<ViewDistances>(forest[0].size(), ViewDistances{}));
@@ -196,6 +199,7 @@ namespace calendar {
 			}
 		}
 
+		assert(highest_scenic_score == 234416);
 		std::cout << highest_scenic_score << '\n';
 	}
 }

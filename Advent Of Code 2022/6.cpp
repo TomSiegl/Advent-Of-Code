@@ -1,15 +1,18 @@
 #include "doors.h"
 #include "input.h"
+#include "abort_reason.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <deque>
 #include <algorithm>
+#include <cassert>
 
 namespace calendar {
-	void solve_puzzle(int num_different_chars) {
+
+	int solve_puzzle(int num_different_chars) {
 		std::ifstream inf{ get_input_stream(6) };
-		if (!inf) { return; }
+		if (!inf) { return abort_reason::no_file_stream; }
 
 		int result{ 0 };
 		char current_char{};
@@ -32,21 +35,28 @@ namespace calendar {
 		}
 
 		if (done) {
-			std::cout << result << "\n";
+			return result;
 		}
 		else {
 			std::cout << "No starting sequence found.\n";
+			return abort_reason::no_starting_sequence;
 		}
 	}
 
 	template<>
 	void first<6>() {
-		solve_puzzle(4);
+		int result{ solve_puzzle(4) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 1707);
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<6>() {
-		solve_puzzle(14);
+		int result{ solve_puzzle(14) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 3697);
+		std::cout << result << '\n';
 	}
 }
 

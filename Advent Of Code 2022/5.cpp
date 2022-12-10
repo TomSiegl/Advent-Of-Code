@@ -6,6 +6,7 @@
 #include <vector>
 #include <sstream>
 #include <functional>
+#include <cassert>
 
 namespace calendar {
 	std::vector<std::vector<char>> read_stacks(std::ifstream& inf) {
@@ -48,7 +49,7 @@ namespace calendar {
 		return stacks;
 	}
 
-	void solve_puzzle(std::function<void(std::vector<std::vector<char>>&, int, int, int)> rearrange) {
+	void solve_puzzle(std::function<void(std::vector<std::vector<char>>&, int, int, int)> rearrange, std::string* result_ptr) {
 		std::ifstream inf{ get_input_stream(5) };
 		if (!inf) { return; }
 		
@@ -70,12 +71,9 @@ namespace calendar {
 			rearrange(stacks, move_count, from_stack, to_stack);
 		}
 
-		std::string solution{};
 		for (int i{ 0 }; i < static_cast<int>(stacks.size()); i++) {
-			solution.push_back(*(stacks[i].end() - 1));
+			(*result_ptr).push_back(*(stacks[i].end() - 1));
 		}
-
-		std::cout << solution << '\n';
 	}
 
 	void rearrange_first(std::vector<std::vector<char>>& stacks, int move_count, int from_stack, int to_stack) {
@@ -92,12 +90,18 @@ namespace calendar {
 
 	template<>
 	void first<5>() {
-		solve_puzzle(rearrange_first);
+		std::string result{};
+		solve_puzzle(rearrange_first, &result);
+		assert(result == "RFFFWBPNS");
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<5>() {
-		solve_puzzle(rearrange_second);
+		std::string result{};
+		solve_puzzle(rearrange_second, &result);
+		assert(result == "CQQBBJFCS");
+		std::cout << result << '\n';
 	}
 }
 

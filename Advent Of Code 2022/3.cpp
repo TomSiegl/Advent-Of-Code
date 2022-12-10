@@ -7,6 +7,7 @@
 #include <vector>
 #include <algorithm>
 #include <functional>
+#include <cassert>
 
 namespace calendar {
 	int get_prio(char c) {
@@ -108,12 +109,20 @@ namespace calendar {
 
 	template<>
 	void first<3>() {
-		solve_puzzle(get_first_prio);
+		std::ifstream inf{ get_input_stream(3) };
+		if (!inf) { return; }
+		int result{ get_first_prio(inf) };
+		assert(result == 7691);
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<3>() {
-		solve_puzzle(get_second_prio);
+		std::ifstream inf{ get_input_stream(3) };
+		if (!inf) { return; }
+		int result{ get_second_prio(inf) };
+		assert(result == 2508);
+		std::cout << result << '\n';
 	}
 }
 

@@ -5,6 +5,7 @@
 #include <string>
 #include <vector>
 #include <algorithm>
+#include <cassert>
 
 namespace calendar {
 	template<>
@@ -28,6 +29,7 @@ namespace calendar {
 
 		max_calories = std::max(max_calories, curr_calories);
 
+		assert(max_calories == 67450);
 		std::cout << max_calories << std::endl;
 	}
 	
@@ -62,6 +64,7 @@ namespace calendar {
 			//std::cout << calories_sums[i] << std::endl;
 		}
 
+		assert(top_three_sum == 199357);
 		std::cout << top_three_sum << std::endl;
 	}
 }

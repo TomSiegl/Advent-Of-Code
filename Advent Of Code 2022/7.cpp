@@ -7,6 +7,7 @@
 #include <sstream>
 #include <algorithm>
 #include <variant>
+#include <cassert>
 
 namespace calendar {
 	// This has to be possible with less pointers...
@@ -151,14 +152,18 @@ namespace calendar {
 	void first<7>() {
 		dir* root = read_filesystem();
 		if (root == nullptr) return;
-		std::cout << sum_small_dirs(root) << '\n';
+		int result{ sum_small_dirs(root) };
+		assert(result == 1583951);
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<7>() {
 		dir* root = read_filesystem();
 		if (root == nullptr) return;
-		std::cout << get_min_deletable_size(root) << '\n';
+		int result{ get_min_deletable_size(root) };
+		assert(result == 214171);
+		std::cout << result << '\n';
 	}
 }
 

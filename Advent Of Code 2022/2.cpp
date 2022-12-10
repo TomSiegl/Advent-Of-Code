@@ -1,9 +1,11 @@
 #include "doors.h"
 #include "input.h"
+#include "abort_reason.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <functional>
+#include <cassert>
 
 namespace calendar {
 	int opponent_to_int(char opponent) {
@@ -34,9 +36,9 @@ namespace calendar {
 		return (opponent + 1) % 3;
 	}
 
-	void solve_puzzle(std::function<void(std::string, int&)> score_update) {
+	int solve_puzzle(std::function<void(std::string, int&)> score_update) {
 		std::ifstream inf{ get_input_stream(2) };
-		if (!inf) { return; }
+		if (!inf) { return abort_reason::no_file_stream; }
 
 		int score = 0;
 
@@ -48,7 +50,7 @@ namespace calendar {
 			score_update(curr_line, score);
 		}
 
-		std::cout << score << '\n';
+		return score;
 	}
 
 	void score_update_first(std::string line, int& score) {
@@ -69,12 +71,18 @@ namespace calendar {
 
 	template<>
 	void first<2>() {
-		solve_puzzle(score_update_first);
+		int result{ solve_puzzle(score_update_first) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 15691);
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<2>() {
-		solve_puzzle(score_update_second);
+		int result{ solve_puzzle(score_update_second) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 12989);
+		std::cout << result << '\n';
 	}
 }
 

@@ -1,15 +1,17 @@
 #include "doors.h"
 #include "input.h"
+#include "abort_reason.h"
 #include <iostream>
 #include <fstream>
 #include <string>
 #include <sstream>
 #include <functional>
+#include <cassert>
 
 namespace calendar {
-	void solve_puzzle(std::function<bool(std::pair<int, int>&, std::pair<int, int>&)> is_overlap) {
+	int solve_puzzle(std::function<bool(std::pair<int, int>&, std::pair<int, int>&)> is_overlap) {
 		std::ifstream inf{ get_input_stream(4) };
-		if (!inf) { return; }
+		if (!inf) { return abort_reason::no_file_stream; }
 
 		int fully_contained_count{ 0 };
 		while (inf) {
@@ -28,7 +30,7 @@ namespace calendar {
 			if (is_overlap(first_interval, second_interval)) { fully_contained_count++; }
 		}
 
-		std::cout << fully_contained_count << '\n';
+		return fully_contained_count;
 	}
 
 	bool inclusion_overlap(std::pair<int, int>& first_interval, std::pair<int, int>& second_interval) {
@@ -46,12 +48,18 @@ namespace calendar {
 
 	template<>
 	void first<4>() {
-		solve_puzzle(inclusion_overlap);
+		int result{ solve_puzzle(inclusion_overlap) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 513);
+		std::cout << result << '\n';
 	}
 
 	template<>
 	void second<4>() {
-		solve_puzzle(any_overlap);
+		int result{ solve_puzzle(any_overlap) };
+		if (result == abort_reason::no_file_stream) { return; }
+		assert(result == 878);
+		std::cout << result << '\n';
 	}
 }
 
