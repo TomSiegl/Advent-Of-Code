@@ -22,7 +22,7 @@ constexpr void constexpr_run_all() {
 }
 
 int main() {
-	constexpr int DOOR{ 10 };
+	constexpr int DOOR{ 11 };
 	//run_single<DOOR>();
 	
 	constexpr_run_all<1, DOOR + 1>();

@@ -42,10 +42,28 @@
     <ClCompile Include="8.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="10.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="9.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="input.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="11.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doors.h">
       <Filter>Quelldateien</Filter>
+    </ClInclude>
+    <ClInclude Include="abort_reason.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="input.h">
+      <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
