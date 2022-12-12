@@ -5,6 +5,7 @@
 #include <string>
 #include <queue>
 #include <set>
+#include <cassert>
 
 namespace calendar {
 	std::pair<int, int> operator+(std::pair<int, int> a, std::pair<int, int> b) {
@@ -46,13 +47,13 @@ namespace calendar {
 	}
 
 	bool is_inside_grid(std::pair<int, int>& position, int row_count, int col_count) {
-		return position.first >= 0 && position.first < row_count&& position.second >= 0 && position.second < col_count;
+		return position.first >= 0 && position.first < row_count && position.second >= 0 && position.second < col_count;
 	}
 
 	void get_neighbor_indices(int row_index, int col_index, int row_count, int col_count, std::vector<std::pair<int, int>>& neighbors, std::vector<std::vector<char>>& grid) {
 		std::vector<std::pair<int, int>> directions{ {1, 0}, {-1, 0}, {0, 1}, {0, -1} };
 		std::pair<int, int> position{ row_index, col_index };
-		for (std::pair<int, int> direction : directions) {
+		for (std::pair<int, int>& direction : directions) {
 			std::pair<int, int> candidate{ position + direction };
 			if (is_inside_grid(candidate, row_count, col_count)) {
 				neighbors.push_back({ get_node_index(candidate.first, candidate.second, col_count), grid[candidate.first][candidate.second] - grid[position.first][position.second]});
@@ -68,10 +69,10 @@ namespace calendar {
 		}
 	}
 
-	void filter_graph_by_edge_cost(std::vector<std::vector<std::pair<int, int>>>& graph, int max_allowed_cost) {
+	void filter_graph_by_edge_cost(std::vector<std::vector<std::pair<int, int>>>& graph, int max_allowed_cost, bool backwards) {
 		for (std::vector<std::pair<int, int>>& curr_node_edges : graph) {
 			for (std::vector<std::pair<int, int>>::iterator it{ curr_node_edges.begin() }; it != curr_node_edges.end();) {
-				if ((*it).second > max_allowed_cost) {
+				if ((!backwards && (*it).second > max_allowed_cost) || (backwards && -(*it).second > max_allowed_cost)) {
 					it = curr_node_edges.erase(it);
 				}
 				else {
@@ -81,7 +82,7 @@ namespace calendar {
 		}
 	}
 
-	void get_shortest_path(std::vector<std::vector<std::pair<int, int>>>& graph, int start_index, int end_index, std::vector<int>& shortest_path) {
+	void get_shortest_path(std::vector<std::vector<std::pair<int, int>>>& graph, int start_index, std::set<int>& end_indices, std::vector<int>& shortest_path) {
 		std::queue<int> next_nodes{};
 		next_nodes.push(start_index);
 
@@ -93,10 +94,12 @@ namespace calendar {
 		std::vector<int> previous(static_cast<int>(graph.size()), -1);
 		previous[start_index] = -1;
 
+		bool break_while{ false };
+		int end_index{ -1 };
 		while (!next_nodes.empty()) {
 			int curr_node{ next_nodes.front() };
 			next_nodes.pop();
-
+			
 			if (visited.find(curr_node) != visited.end()) { continue; }
 			visited.insert(curr_node);
 
@@ -106,10 +109,16 @@ namespace calendar {
 				distances[edge.first] = distances[curr_node] + 1;
 				previous[edge.first] = curr_node;
 
-				if (edge.first == end_index) { break; }
+				if (end_indices.find(edge.first) != end_indices.end()) { 
+					break_while = true;
+					end_index = edge.first;
+					break;
+				}
 
 				next_nodes.push(edge.first);
 			}
+
+			if (break_while) { break; }
 		}
 
 		shortest_path.push_back(end_index);
@@ -119,7 +128,7 @@ namespace calendar {
 		std::reverse(shortest_path.begin(), shortest_path.end());
 	}
 
-	void print_path(std::vector<int>& shortest_path, int row_count, int col_count) {
+	void print_path(std::vector<int>& shortest_path, int row_count, int col_count, std::vector<std::vector<char>>& grid) {
 		std::set<int> path_nodes{ shortest_path.begin(), shortest_path.end() };
 
 		std::cout << '\n';
@@ -127,13 +136,23 @@ namespace calendar {
 			for (int col{ 0 }; col < col_count; ++col) {
 				int node_index{ get_node_index(row, col, col_count) };
 				if (path_nodes.find(node_index) != path_nodes.end()) {
-					std::cout << 'X';
+					std::cout << ' ';
 				}
 				else {
-					std::cout << '.';
+					std::cout << grid[row][col];
 				}
 			}
 			std::cout << '\n';
+		}
+	}
+
+	void fill_end_indices(std::vector<std::vector<char>>& grid, std::set<int>& end_indices) {
+		for (int row{ 0 }; row < grid.size(); ++row) {
+			for (int col{ 0 }; col < grid[0].size(); ++col) {
+				if (grid[row][col] == 'a') {
+					end_indices.insert(get_node_index(row, col, grid[0].size()));
+				}
+			}
 		}
 	}
 
@@ -153,18 +172,45 @@ namespace calendar {
 
 		std::vector<std::vector<std::pair<int, int>>> graph{ grid.size() * grid[0].size(), std::vector<std::pair<int, int>>{} };
 		construct_graph(grid, graph);
-		filter_graph_by_edge_cost(graph, 1);
+		filter_graph_by_edge_cost(graph, 1, false);
 
 		std::vector<int> shortest_path{};
-		get_shortest_path(graph, start_index, end_index, shortest_path);
-		print_path(shortest_path, grid.size(), grid[0].size());
+		std::set<int> end_indices{ end_index };
+		get_shortest_path(graph, start_index, end_indices, shortest_path);
+		//print_path(shortest_path, grid.size(), grid[0].size(), grid);
 
-		std::cout << shortest_path.size() - 1 << '\n';
+		int shortest_path_length{ static_cast<int>(shortest_path.size()) - 1 };
+		assert(shortest_path_length == 440);
+		std::cout << shortest_path_length << '\n';
 	}
 
 	template<>
 	void second<12>() {
-		std::cout << "Not yet implemented.\n";
+		std::string filename{ "12.txt" };
+		std::ifstream inf{ get_input_stream(filename) };
+		if (!inf) { return; }
+
+		std::vector<std::vector<char>> grid{};
+		std::pair<int, int> start{};
+		std::pair<int, int> end{};
+		read_grid(inf, grid, start, end);
+
+		int start_index{ get_node_index(start.first, start.second, grid[0].size()) };
+		int end_index{ get_node_index(end.first, end.second, grid[0].size()) };
+
+		std::vector<std::vector<std::pair<int, int>>> graph{ grid.size() * grid[0].size(), std::vector<std::pair<int, int>>{} };
+		construct_graph(grid, graph);
+		filter_graph_by_edge_cost(graph, 1, true);
+
+		std::vector<int> shortest_path{};
+		std::set<int> end_indices{};
+		fill_end_indices(grid, end_indices);
+		get_shortest_path(graph, end_index, end_indices, shortest_path);
+		//print_path(shortest_path, grid.size(), grid[0].size(), grid);
+
+		int shortest_path_length{ static_cast<int>(shortest_path.size()) - 1 };
+		assert(shortest_path_length == 439);
+		std::cout << shortest_path_length << '\n';
 	}
 }
 
