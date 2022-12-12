@@ -54,6 +54,9 @@
     <ClCompile Include="11.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="12.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="doors.h">
