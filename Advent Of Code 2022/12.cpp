@@ -55,7 +55,7 @@ namespace calendar {
 		for (std::pair<int, int> direction : directions) {
 			std::pair<int, int> candidate{ position + direction };
 			if (is_inside_grid(candidate, row_count, col_count)) {
-				neighbors.push_back({ get_node_index(row_index, col_index, col_count), grid[candidate.first][candidate.second] - grid[position.first][position.second]});
+				neighbors.push_back({ get_node_index(candidate.first, candidate.second, col_count), grid[candidate.first][candidate.second] - grid[position.first][position.second]});
 			}
 		}
 	}
@@ -81,36 +81,66 @@ namespace calendar {
 		}
 	}
 
-	int get_shortest_path_length(std::vector<std::vector<std::pair<int, int>>>& graph, int start_index, int end_index) {
+	void get_shortest_path(std::vector<std::vector<std::pair<int, int>>>& graph, int start_index, int end_index, std::vector<int>& shortest_path) {
 		std::queue<int> next_nodes{};
 		next_nodes.push(start_index);
 
 		std::set<int> visited{};
-		visited.insert(start_index);
 
 		std::vector<int> distances(static_cast<int>(graph.size()), -1);
 		distances[start_index] = 0;
+
+		std::vector<int> previous(static_cast<int>(graph.size()), -1);
+		previous[start_index] = -1;
 
 		while (!next_nodes.empty()) {
 			int curr_node{ next_nodes.front() };
 			next_nodes.pop();
 
+			if (visited.find(curr_node) != visited.end()) { continue; }
+			visited.insert(curr_node);
+
 			for (std::pair<int, int>& edge : graph[curr_node]) {
 				if (visited.find(edge.first) != visited.end()) { continue; }
 
 				distances[edge.first] = distances[curr_node] + 1;
+				previous[edge.first] = curr_node;
 
-				if (edge.first == end_index) { return distances[edge.first]; }
+				if (edge.first == end_index) { break; }
 
-				next_nodes.push(curr_node);
-				visited.insert(curr_node);
+				next_nodes.push(edge.first);
 			}
+		}
+
+		shortest_path.push_back(end_index);
+		while (previous[shortest_path[shortest_path.size() - 1]] != -1) {
+			shortest_path.push_back(previous[shortest_path[shortest_path.size() - 1]]);
+		}
+		std::reverse(shortest_path.begin(), shortest_path.end());
+	}
+
+	void print_path(std::vector<int>& shortest_path, int row_count, int col_count) {
+		std::set<int> path_nodes{ shortest_path.begin(), shortest_path.end() };
+
+		std::cout << '\n';
+		for (int row{ 0 }; row < row_count; ++row) {
+			for (int col{ 0 }; col < col_count; ++col) {
+				int node_index{ get_node_index(row, col, col_count) };
+				if (path_nodes.find(node_index) != path_nodes.end()) {
+					std::cout << 'X';
+				}
+				else {
+					std::cout << '.';
+				}
+			}
+			std::cout << '\n';
 		}
 	}
 
 	template<>
 	void first<12>() {
-		std::ifstream inf{ get_input_stream(12) };
+		std::string filename{ "12.txt" };
+		std::ifstream inf{ get_input_stream(filename) };
 		if (!inf) { return; }
 
 		std::vector<std::vector<char>> grid{};
@@ -125,9 +155,11 @@ namespace calendar {
 		construct_graph(grid, graph);
 		filter_graph_by_edge_cost(graph, 1);
 
-		int shortest_path_length{ get_shortest_path_length(graph, start_index, end_index) };
+		std::vector<int> shortest_path{};
+		get_shortest_path(graph, start_index, end_index, shortest_path);
+		print_path(shortest_path, grid.size(), grid[0].size());
 
-		std::cout << shortest_path_length << '\n';
+		std::cout << shortest_path.size() - 1 << '\n';
 	}
 
 	template<>
